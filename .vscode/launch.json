@@ -2,7 +2,7 @@
   "name": "inf653-midterm",
   "version": "1.0.0",
   "description": "Midterm project for INF653",
-  "main": "main.go",  // Since your project is Go-based, change the entry file to main.go
+  "main": "main.go",
   "scripts": {
     "start": "go run main.go",  // Adjusted for running the Go application
     "dev": "gin --appPort 8080", // Optional for running in development mode with Gin
@@ -30,5 +30,3 @@
   },
   "homepage": "https://github.com/Antony-Reyes/inf653_ar_midterm#readme"  // Link to your GitHub repository homepage
 }
-
-  
