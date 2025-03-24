@@ -1,37 +1,34 @@
 {
-    "name": "inf653-midterm",
-    "version": "1.0.0",
-    "description": "Midterm project for INF653",
-    "main": "index.js",  // Change this if your main entry file is different
-    "scripts": {
-      "start": "node server.js",  // Adjust for your server start script
-      "dev": "nodemon server.js", // Optional for development with hot-reloading
-      "build": "echo 'No build script provided' && exit 0", // Add build script if needed
-      "test": "echo 'No tests specified' && exit 0" // Adjust for test scripts if you have tests
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-      "express": "^4.18.1",  // Assuming you're using Express, adjust as needed
-      "mongoose": "^6.0.0",  // If using MongoDB (mongoose)
-      "dotenv": "^16.0.0",  // For environment variables, adjust the version as needed
-      "cors": "^2.8.5",      // If you're handling CORS issues
-      "nodemon": "^2.0.20"   // Optional for development
-    },
-    "devDependencies": {
-      "jest": "^29.0.0", // If you have tests, you can use Jest or another test framework
-      "supertest": "^6.0.1" // If you're testing APIs with supertest
-    },
-    "engines": {
-      "node": ">=14.0.0" // Specify the Node.js version required
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/yourusername/your-repository.git"
-    },
-    "bugs": {
-      "url": "https://github.com/yourusername/your-repository/issues"
-    },
-    "homepage": "https://github.com/yourusername/your-repository#readme"
-  }
+  "name": "inf653-midterm",
+  "version": "1.0.0",
+  "description": "Midterm project for INF653",
+  "main": "main.go",  // Since your project is Go-based, change the entry file to main.go
+  "scripts": {
+    "start": "go run main.go",  // Adjusted for running the Go application
+    "dev": "gin --appPort 8080", // Optional for running in development mode with Gin
+    "build": "go build -o app",  // Adjusted to build the Go application
+    "test": "echo 'No tests specified' && exit 0" // Adjust for test scripts if you have tests
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gin": "^1.8.0" // Ensure Gin is included in your dependencies
+  },
+  "devDependencies": {
+    "jest": "^29.0.0", // Optional if you have tests
+    "supertest": "^6.0.1" // Optional for testing APIs with Supertest
+  },
+  "engines": {
+    "go": ">=1.18.0" // Specify the Go version required for the project
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Antony-Reyes/inf653_ar_midterm.git"  // Your GitHub repository URL
+  },
+  "bugs": {
+    "url": "https://github.com/Antony-Reyes/inf653_ar_midterm/issues"  // Link to your GitHub issues page
+  },
+  "homepage": "https://github.com/Antony-Reyes/inf653_ar_midterm#readme"  // Link to your GitHub repository homepage
+}
+
   
