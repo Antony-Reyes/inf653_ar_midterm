@@ -2,27 +2,43 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// Set Gin to release mode for production
+	gin.SetMode(gin.ReleaseMode)
+
 	// Create a new Gin router
 	r := gin.Default()
 
-	// Define a simple route
-	r.GET("/api", func(c *gin.Context) {
+	// Handle the root route "/"
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello, world!",
+			"message": "Welcome to the API!",
 		})
 	})
 
-	// Start the server on port 8080
-	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Error starting server: %v", err)
+	// Handle the "/api" route (your existing API logic)
+	r.GET("/api", func(c *gin.Context) {
+		// Your API logic here, for example:
+		c.JSON(http.StatusOK, gin.H{
+			"status": "API is running",
+		})
+	})
+
+	// Get the port from the environment variable
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default port if not set
 	}
 
-	fmt.Println("Server running at http://localhost:8080")
+	// Run the server on the specified port
+	err := r.Run(":" + port)
+	if err != nil {
+		fmt.Println("Error starting server: ", err)
+	}
 }
