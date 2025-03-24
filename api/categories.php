@@ -1,5 +1,5 @@
 <?php
-include '../config.php';
+include '/api/config.php';
 require_once "database.php";
 
 $database = new Database();

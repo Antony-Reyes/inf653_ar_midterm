@@ -1,5 +1,5 @@
 <?php
-include '../config.php';
+include '/api/config.php';
 
 class Database {
     private $host;
