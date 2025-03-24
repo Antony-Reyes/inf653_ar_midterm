@@ -1,45 +1,37 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Listen for Xdebug",
-            "type": "php",
-            "request": "launch",
-            "port": 9003
-        },
-        {
-            "name": "Launch currently open script",
-            "type": "php",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${fileDirname}",
-            "port": 9003,  // Set the port to match your Xdebug configuration
-            "runtimeArgs": [
-                "-dxdebug.start_with_request=yes"
-            ],
-            "env": {
-                "XDEBUG_MODE": "debug,develop",
-                "XDEBUG_CONFIG": "client_port=${port}"
-            }
-        },
-        {
-            "name": "Launch Built-in web server",
-            "type": "php",
-            "request": "launch",
-            "runtimeArgs": [
-                "-dxdebug.mode=debug",
-                "-dxdebug.start_with_request=yes",
-                "-S",
-                "localhost:0"
-            ],
-            "program": "",
-            "cwd": "${workspaceRoot}",
-            "port": 9003,
-            "serverReadyAction": {
-                "pattern": "Development Server \\(http://localhost:([0-9]+)\\) started",
-                "uriFormat": "http://localhost:%s",
-                "action": "openExternally"
-            }
-        }
-    ]
-}
+    "name": "inf653-midterm",
+    "version": "1.0.0",
+    "description": "Midterm project for INF653",
+    "main": "index.js",  // Change this if your main entry file is different
+    "scripts": {
+      "start": "node server.js",  // Adjust for your server start script
+      "dev": "nodemon server.js", // Optional for development with hot-reloading
+      "build": "echo 'No build script provided' && exit 0", // Add build script if needed
+      "test": "echo 'No tests specified' && exit 0" // Adjust for test scripts if you have tests
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "express": "^4.18.1",  // Assuming you're using Express, adjust as needed
+      "mongoose": "^6.0.0",  // If using MongoDB (mongoose)
+      "dotenv": "^16.0.0",  // For environment variables, adjust the version as needed
+      "cors": "^2.8.5",      // If you're handling CORS issues
+      "nodemon": "^2.0.20"   // Optional for development
+    },
+    "devDependencies": {
+      "jest": "^29.0.0", // If you have tests, you can use Jest or another test framework
+      "supertest": "^6.0.1" // If you're testing APIs with supertest
+    },
+    "engines": {
+      "node": ">=14.0.0" // Specify the Node.js version required
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/yourusername/your-repository.git"
+    },
+    "bugs": {
+      "url": "https://github.com/yourusername/your-repository/issues"
+    },
+    "homepage": "https://github.com/yourusername/your-repository#readme"
+  }
+  
