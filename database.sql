@@ -1,5 +1,6 @@
-CREATE DATABASE IF NOT EXISTS quotesdb;
-USE quotesdb;
+-- Ensure the database is created only if it does not exist
+CREATE DATABASE IF NOT EXISTS INF653_AR_Midterm;
+USE INF653_AR_Midterm;
 
 -- Authors Table
 CREATE TABLE IF NOT EXISTS authors (
@@ -25,24 +26,25 @@ CREATE TABLE IF NOT EXISTS quotes (
 
 -- Insert Sample Authors
 INSERT INTO authors (author) VALUES
-('Albert Einstein'),
-('Mark Twain'),
-('Maya Angelou'),
-('William Shakespeare'),
-('Confucius');
+    ('Albert Einstein'),
+    ('Mark Twain'),
+    ('Maya Angelou'),
+    ('William Shakespeare'),
+    ('Confucius');
 
 -- Insert Sample Categories
 INSERT INTO categories (category) VALUES
-('Motivation'),
-('Philosophy'),
-('Life'),
-('Happiness'),
-('Success');
+    ('Motivation'),
+    ('Philosophy'),
+    ('Life'),
+    ('Happiness'),
+    ('Success');
 
 -- Insert Sample Quotes
 INSERT INTO quotes (quote, author_id, category_id) VALUES
-('Life is like riding a bicycle. To keep your balance, you must keep moving.', 1, 3),
-('The secret of getting ahead is getting started.', 2, 5),
-('You may not control all the events that happen to you, but you can decide not to be reduced by them.', 3, 3),
-('Some are born great, some achieve greatness, and some have greatness thrust upon them.', 4, 5),
-('It does not matter how slowly you go as long as you do not stop.', 5, 1);
+    ('Life is like riding a bicycle. To keep your balance, you must keep moving.', 1, 3),
+    ('The secret of getting ahead is getting started.', 2, 5),
+    ('You may not control all the events that happen to you, but you can decide not to be reduced by them.', 3, 3),
+    ('Some are born great, some achieve greatness, and some have greatness thrust upon them.', 4, 5),
+    ('It does not matter how slowly you go as long as you do not stop.', 5, 1);
+
