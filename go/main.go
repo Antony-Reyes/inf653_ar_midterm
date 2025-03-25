@@ -230,32 +230,35 @@ func getCategories(c *gin.Context) {
 }
 
 func main() {
-	// Initialize database
-	initDB()
-	defer db.Close()
+    // Initialize database
+    initDB()
+    defer db.Close()
 
-	// Set up Gin router
-	r := gin.Default()
+    // Set up Gin router
+    r := gin.Default()
 
-	// Apply CORS middleware
-	r.Use(corsMiddleware())
+    // Enable CORS (for Netlify/frontend)
+    r.Use(func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
+        c.Next()
+    })
 
-	// Define API routes
-	r.GET("/api/quotes", getQuotes)
-	r.GET("/api/authors", getAuthors)
-	r.GET("/api/categories", getCategories)
+    // Define API routes
+    r.GET("/api/quotes", getQuotes)
+    r.GET("/api/authors", getAuthors)
+    r.GET("/api/categories", getCategories)
 
-	// Start server
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("❌ PORT environment variable not set. Ensure it's configured in Render.")
-	}
-	log.Println("🚀 Server is running on port", port)
+    // Get PORT from environment variables
+    port := os.Getenv("PORT")
+    if port == "" {
+        log.Fatal("❌ PORT environment variable not set. Ensure it's configured in Render.")
+    }
 
-	// Ensure database is still reachable before running the server
-	if err := db.Ping(); err != nil {
-		log.Fatal("❌ Database is not reachable:", err)
-	}
+    log.Println("🚀 Server is running on port", port)
 
-	r.Run(":" + port)
+    // Run the server on the specified PORT
+    r.Run(":" + port)
 }
+
