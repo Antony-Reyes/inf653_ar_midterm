@@ -1,32 +1,22 @@
 {
-  "name": "inf653-midterm",
-  "version": "1.0.0",
-  "description": "Midterm project for INF653",
-  "main": "main.go",
-  "scripts": {
-    "start": "go run main.go",  // Adjusted for running the Go application
-    "dev": "gin --appPort 8080", // Optional for running in development mode with Gin
-    "build": "go build -o app",  // Adjusted to build the Go application
-    "test": "echo 'No tests specified' && exit 0" // Adjust for test scripts if you have tests
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "gin": "^1.8.0" // Ensure Gin is included in your dependencies
-  },
-  "devDependencies": {
-    "jest": "^29.0.0", // Optional if you have tests
-    "supertest": "^6.0.1" // Optional for testing APIs with Supertest
-  },
-  "engines": {
-    "go": ">=1.18.0" // Specify the Go version required for the project
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Antony-Reyes/inf653_ar_midterm.git"  // Your GitHub repository URL
-  },
-  "bugs": {
-    "url": "https://github.com/Antony-Reyes/inf653_ar_midterm/issues"  // Link to your GitHub issues page
-  },
-  "homepage": "https://github.com/Antony-Reyes/inf653_ar_midterm#readme"  // Link to your GitHub repository homepage
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "name": "Launch INF653 Midterm",
+          "type": "go",
+          "request": "launch",
+          "mode": "debug",
+          "program": "${workspaceFolder}/main.go",
+          "env": {
+              "DB_USER": "your_db_user",
+              "DB_PASSWORD": "your_db_password",
+              "DB_HOST": "your_db_host",
+              "DB_NAME": "INF653_AR_Midterm",
+              "PORT": "8080"
+          },
+          "args": [],
+          "cwd": "${workspaceFolder}",
+          "console": "integratedTerminal"
+      }
+  ]
 }
