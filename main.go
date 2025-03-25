@@ -2,13 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql" // Import MySQL driver
+	_ "github.com/go-sql-driver/mysql" // MySQL driver
 )
 
 var db *sql.DB
@@ -17,37 +16,100 @@ var db *sql.DB
 func initDB() {
 	var err error
 
-	// Load database credentials from environment variables (set in Render)
+	// Load database credentials from Render's environment variables
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbHost := os.Getenv("DB_HOST")
-	dbName := "DB_NAME" // Database name
+	dbName := os.Getenv("DB_NAME")
 
-	// Ensure all necessary variables are set
-	if dbUser == "" || dbPassword == "" || dbHost == "" {
+	// Check for missing variables
+	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
 		log.Fatal("❌ Missing required database environment variables")
 	}
 
-	// Data Source Name (DSN) for MySQL connection
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName)
+	// MySQL connection string
+	dsn := dbUser + ":" + dbPassword + "@tcp(" + dbHost + ":3306)/" + dbName + "?parseTime=true"
 
-	// Open database connection
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
-		log.Fatal("❌ Error opening database:", err)
+		log.Fatal("❌ Error opening database: ", err)
 	}
 
 	// Verify database connection
 	if err := db.Ping(); err != nil {
-		log.Fatal("❌ Error pinging database:", err)
+		log.Fatal("❌ Error pinging database: ", err)
 	}
 
 	log.Println("✅ Connected to MySQL database successfully")
 }
 
-// Route for fetching all authors
+// GET /api/quotes/ - Fetch all quotes or filter by parameters
+func getQuotes(c *gin.Context) {
+	id := c.Query("id")
+	authorID := c.Query("author_id")
+	categoryID := c.Query("category_id")
+
+	query := "SELECT quotes.id, quotes.quote, authors.author, categories.category FROM quotes " +
+		"JOIN authors ON quotes.author_id = authors.id " +
+		"JOIN categories ON quotes.category_id = categories.id"
+
+	var args []interface{}
+
+	if id != "" {
+		query += " WHERE quotes.id = ?"
+		args = append(args, id)
+	} else if authorID != "" {
+		query += " WHERE quotes.author_id = ?"
+		args = append(args, authorID)
+	} else if categoryID != "" {
+		query += " WHERE quotes.category_id = ?"
+		args = append(args, categoryID)
+	}
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var quotes []map[string]interface{}
+	for rows.Next() {
+		var id int
+		var quote, author, category string
+		if err := rows.Scan(&id, &quote, &author, &category); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		quotes = append(quotes, map[string]interface{}{
+			"id":       id,
+			"quote":    quote,
+			"author":   author,
+			"category": category,
+		})
+	}
+
+	if len(quotes) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "No Quotes Found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, quotes)
+}
+
+// GET /api/authors/ - Fetch all authors
 func getAuthors(c *gin.Context) {
-	rows, err := db.Query("SELECT id, author FROM authors")
+	id := c.Query("id")
+
+	query := "SELECT id, author FROM authors"
+	var args []interface{}
+
+	if id != "" {
+		query += " WHERE id = ?"
+		args = append(args, id)
+	}
+
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -68,39 +130,57 @@ func getAuthors(c *gin.Context) {
 		})
 	}
 
+	if len(authors) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Author Not Found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, authors)
 }
 
-// Route for fetching all quotes
-func getQuotes(c *gin.Context) {
-	rows, err := db.Query("SELECT id, quote, author_id, category_id FROM quotes")
+// GET /api/categories/ - Fetch all categories
+func getCategories(c *gin.Context) {
+	id := c.Query("id")
+
+	query := "SELECT id, category FROM categories"
+	var args []interface{}
+
+	if id != "" {
+		query += " WHERE id = ?"
+		args = append(args, id)
+	}
+
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	defer rows.Close()
 
-	var quotes []map[string]interface{}
+	var categories []map[string]interface{}
 	for rows.Next() {
-		var id, authorID, categoryID int
-		var quote string
-		if err := rows.Scan(&id, &quote, &authorID, &categoryID); err != nil {
+		var id int
+		var category string
+		if err := rows.Scan(&id, &category); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		quotes = append(quotes, map[string]interface{}{
-			"id":          id,
-			"quote":       quote,
-			"author_id":   authorID,
-			"category_id": categoryID,
+		categories = append(categories, map[string]interface{}{
+			"id":       id,
+			"category": category,
 		})
 	}
 
-	c.JSON(http.StatusOK, quotes)
+	if len(categories) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Category Not Found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, categories)
 }
 
 func main() {
-	// Initialize the database connection
+	// Initialize database
 	initDB()
 	defer db.Close()
 
@@ -110,8 +190,9 @@ func main() {
 	// Define API routes
 	r.GET("/api/quotes", getQuotes)
 	r.GET("/api/authors", getAuthors)
+	r.GET("/api/categories", getCategories)
 
-	// Get Render-assigned port (fallback to 8080 for local testing)
+	// Get Render-assigned port (default to 8080)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -121,6 +202,6 @@ func main() {
 
 	// Start the server
 	if err := r.Run(":" + port); err != nil {
-		log.Fatal("❌ Unable to start server:", err)
+		log.Fatal("❌ Unable to start server: ", err)
 	}
 }
