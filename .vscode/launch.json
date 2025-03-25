@@ -1,20 +1,18 @@
 {
-  "version": "0.2.0",
-  "configurations": [
+    "version": "0.2.0",
+    "configurations": [
       {
-          "name": "Launch Go API",
-          "type": "go",
-          "request": "launch",
-          "mode": "auto",
-          "program": "${workspaceFolder}/main.go",
-          "env": {
-              "DB_USER": "your_database_password",
-              "DB_PASSWORD": "your_database_password",
-              "DB_HOST": "your-database-host.render.com",
-              "DB_NAME": "DB_NAME",
-              "PORT": "3306"
-          },
-          "args": []
+        "name": "Launch Go App",
+        "type": "go",
+        "request": "launch",
+        "mode": "debug",
+        "program": "${workspaceFolder}/go/main.go",
+        "env": {
+          "PORT": "8080",
+          "DATABASE_URL": "your_database_url_here"
+        },
+        "args": [],
+        "showLog": true
       }
-  ]
-}
+    ]
+  }
