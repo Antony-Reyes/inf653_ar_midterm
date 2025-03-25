@@ -27,12 +27,6 @@ func initDB() {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	dbPort := os.Getenv("DB_PORT")
-
-	// Default to MySQL port 3306 if DB_PORT is not set
-	if dbPort == "" {
-		dbPort = "3306"
-	}
 
 	// Ensure all required environment variables are set
 	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
@@ -43,11 +37,10 @@ func initDB() {
 	log.Println("🔹 DB_USER:", dbUser)
 	log.Println("🔹 DB_HOST:", dbHost)
 	log.Println("🔹 DB_NAME:", dbName)
-	log.Println("🔹 DB_PORT:", dbPort)
 
-	// MySQL connection string
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		dbUser, dbPassword, dbHost, dbPort, dbName,
+	// MySQL connection string (Using default port 3306)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbUser, dbPassword, dbHost, dbName,
 	)
 
 	// Open database connection
@@ -230,35 +223,23 @@ func getCategories(c *gin.Context) {
 }
 
 func main() {
-    // Initialize database
-    initDB()
-    defer db.Close()
+	// Initialize database
+	initDB()
+	defer db.Close()
 
-    // Set up Gin router
-    r := gin.Default()
+	// Set up Gin router
+	r := gin.Default()
 
-    // Enable CORS (for Netlify/frontend)
-    r.Use(func(c *gin.Context) {
-        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
-        c.Next()
-    })
+	// Enable CORS (for Netlify/frontend)
+	r.Use(corsMiddleware())
 
-    // Define API routes
-    r.GET("/api/quotes", getQuotes)
-    r.GET("/api/authors", getAuthors)
-    r.GET("/api/categories", getCategories)
+	// Define API routes
+	r.GET("/api/quotes", getQuotes)
+	r.GET("/api/authors", getAuthors)
+	r.GET("/api/categories", getCategories)
 
-    // Get PORT from environment variables
-    port := os.Getenv("PORT")
-    if port == "" {
-        log.Fatal("❌ PORT environment variable not set. Ensure it's configured in Render.")
-    }
+	log.Println("🚀 Server is running on default port 8080")
 
-    log.Println("🚀 Server is running on port", port)
-
-    // Run the server on the specified PORT
-    r.Run(":" + port)
+	// Run the server on default port 8080
+	r.Run(":8080")
 }
-
