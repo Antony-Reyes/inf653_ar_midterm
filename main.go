@@ -23,13 +23,19 @@ func initDB() {
 	}
 
 	// Get database credentials from environment variables
+	dbHost := os.Getenv("DB_HOST")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
 	dbName := os.Getenv("DB_NAME")
+	dbPort := os.Getenv("DB_PORT")
+
+	// Default to MySQL port 3306 if DB_PORT is not set
+	if dbPort == "" {
+		dbPort = "3306"
+	}
 
 	// Check for missing variables
-	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
+	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" || dbPort == "" {
 		log.Fatal("❌ Missing required database environment variables")
 	}
 
@@ -37,22 +43,26 @@ func initDB() {
 	log.Println("🔹 DB_USER:", dbUser)
 	log.Println("🔹 DB_HOST:", dbHost)
 	log.Println("🔹 DB_NAME:", dbName)
+	log.Println("🔹 DB_PORT:", dbPort)
 
 	// MySQL connection string
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true",
-		dbUser, dbPassword, dbHost, dbName,
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
 	)
 
 	// Open database connection
-	db, err = sql.Open("mysql", dsn)
+	dbConn, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("❌ Error opening database:", err)
 	}
 
 	// Verify database connection
-	if err := db.Ping(); err != nil {
+	if err := dbConn.Ping(); err != nil {
 		log.Fatal("❌ Error pinging database:", err)
 	}
+
+	// Assign connection to global db variable
+	db = dbConn
 
 	log.Println("✅ Connected to MySQL database successfully")
 }
@@ -67,26 +77,26 @@ func getQuotes(c *gin.Context) {
 		"JOIN authors ON quotes.author_id = authors.id " +
 		"JOIN categories ON quotes.category_id = categories.id"
 	var args []interface{}
+	conditions := []string{}
 
 	// Handle multiple filters
 	if id != "" {
-		query += " WHERE quotes.id = ?"
+		conditions = append(conditions, "quotes.id = ?")
 		args = append(args, id)
-	} else {
-		conditions := []string{}
-		if authorID != "" {
-			conditions = append(conditions, "quotes.author_id = ?")
-			args = append(args, authorID)
-		}
-		if categoryID != "" {
-			conditions = append(conditions, "quotes.category_id = ?")
-			args = append(args, categoryID)
-		}
-		if len(conditions) > 0 {
-			query += " WHERE " + conditions[0]
-			for _, condition := range conditions[1:] {
-				query += " AND " + condition
-			}
+	}
+	if authorID != "" {
+		conditions = append(conditions, "quotes.author_id = ?")
+		args = append(args, authorID)
+	}
+	if categoryID != "" {
+		conditions = append(conditions, "quotes.category_id = ?")
+		args = append(args, categoryID)
+	}
+
+	if len(conditions) > 0 {
+		query += " WHERE " + conditions[0]
+		for _, condition := range conditions[1:] {
+			query += " AND " + condition
 		}
 	}
 
@@ -222,5 +232,11 @@ func main() {
 		port = "8080" // Default to port 8080 if not set
 	}
 	log.Println("🚀 Server is running on port", port)
+
+	// Ensure database is still reachable before running the server
+	if err := db.Ping(); err != nil {
+		log.Fatal("❌ Database is not reachable:", err)
+	}
+
 	r.Run(":" + port)
 }
