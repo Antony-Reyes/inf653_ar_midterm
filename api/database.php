@@ -9,8 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-require_once __DIR__ . "/config.php";
-
 class Database {
     private $host;
     private $db_name;
@@ -19,19 +17,19 @@ class Database {
     public $conn;
 
     public function __construct() {
-        // Load database credentials from config.php
-        $this->host = DB_HOST;
-        $this->db_name = DB_NAME;
-        $this->username = DB_USER;
-        $this->password = DB_PASS;
+        // Load database credentials from environment variables
+        $this->host = getenv('DB_HOST') ?: 'localhost';
+        $this->db_name = getenv('DB_NAME') ?: 'INF653_AR_Midterm';
+        $this->username = getenv('DB_USER') ?: 'your_database_username';
+        $this->password = getenv('DB_PASSWORD') ?: 'your_database_password';
     }
 
     public function connect() {
         $this->conn = null;
         try {
             // Establish PDO connection with error mode set to exception
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, 
-                                  $this->username, $this->password);
+            $dsn = "mysql:host=" . $this->host . ";dbname=" . $this->db_name;
+            $this->conn = new PDO($dsn, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             echo "Connection error: " . $e->getMessage();
@@ -40,3 +38,4 @@ class Database {
     }
 }
 ?>
+
