@@ -3,7 +3,7 @@
 $host = getenv("DB_HOST") ?: "localhost"; // Default to localhost for local testing
 $username = getenv("DB_USER") ?: "root"; // Default MySQL username for XAMPP
 $password = getenv("DB_PASSWORD") ?: ""; // Default password (empty in XAMPP)
-$dbname = getenv("INF653_AR_Midterm") ?: "INF653_AR_Midterm"; // Database name
+$dbname = getenv("DB_NAME") ?: "DB_NAME"; // Database name
 
 try {
     // Create a PDO connection

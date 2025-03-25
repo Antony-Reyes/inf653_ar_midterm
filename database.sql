@@ -1,6 +1,6 @@
 -- Ensure the database is created only if it does not exist
-CREATE DATABASE IF NOT EXISTS INF653_AR_Midterm;
-USE INF653_AR_Midterm;
+CREATE DATABASE IF NOT EXISTS DB_NAME;
+USE DB_NAME;
 
 -- Authors Table
 CREATE TABLE IF NOT EXISTS authors (

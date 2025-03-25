@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,24 +21,25 @@ func initDB() {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbHost := os.Getenv("DB_HOST")
-	dbName := os.Getenv("DB_NAME")
+	dbName := "DB_NAME" // Database name
 
 	// Ensure all necessary variables are set
-	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
+	if dbUser == "" || dbPassword == "" || dbHost == "" {
 		log.Fatal("❌ Missing required database environment variables")
 	}
 
 	// Data Source Name (DSN) for MySQL connection
-	dsn := dbUser + ":" + dbPassword + "@tcp(" + dbHost + ":3306)/" + dbName + "?parseTime=true"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName)
 
+	// Open database connection
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
-		log.Fatal("❌ Error opening database: ", err)
+		log.Fatal("❌ Error opening database:", err)
 	}
 
 	// Verify database connection
 	if err := db.Ping(); err != nil {
-		log.Fatal("❌ Error pinging database: ", err)
+		log.Fatal("❌ Error pinging database:", err)
 	}
 
 	log.Println("✅ Connected to MySQL database successfully")
@@ -45,7 +47,7 @@ func initDB() {
 
 // Route for fetching all authors
 func getAuthors(c *gin.Context) {
-	rows, err := db.Query("SELECT id, author FROM authors") // Updated column name
+	rows, err := db.Query("SELECT id, author FROM authors")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -109,7 +111,7 @@ func main() {
 	r.GET("/api/quotes", getQuotes)
 	r.GET("/api/authors", getAuthors)
 
-	// Get Render-assigned port (fallback to 8080)
+	// Get Render-assigned port (fallback to 8080 for local testing)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -119,6 +121,6 @@ func main() {
 
 	// Start the server
 	if err := r.Run(":" + port); err != nil {
-		log.Fatal("❌ Unable to start server: ", err)
+		log.Fatal("❌ Unable to start server:", err)
 	}
 }
