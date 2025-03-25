@@ -28,17 +28,22 @@ func initDB() {
 		log.Fatal("❌ Missing required database environment variables")
 	}
 
+	// Log connection details for debugging (excluding password)
+	log.Println("🔹 DB_USER:", dbUser)
+	log.Println("🔹 DB_HOST:", dbHost)
+	log.Println("🔹 DB_NAME:", dbName)
+
 	// MySQL connection string
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName)
 
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
-		log.Fatal("❌ Error opening database: ", err)
+		log.Fatal("❌ Error opening database:", err)
 	}
 
 	// Verify database connection
 	if err := db.Ping(); err != nil {
-		log.Fatal("❌ Error pinging database: ", err)
+		log.Fatal("❌ Error pinging database:", err)
 	}
 
 	log.Println("✅ Connected to MySQL database successfully")
