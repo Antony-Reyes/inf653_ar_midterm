@@ -179,29 +179,30 @@ func getCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
-func main() {
-	// Initialize database
-	initDB()
-	defer db.Close()
+func initDB() {
+	var err error
 
-	// Set up Gin router
-	r := gin.Default()
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbName := os.Getenv("DB_NAME")
 
-	// Define API routes
-	r.GET("/api/quotes", getQuotes)
-	r.GET("/api/authors", getAuthors)
-	r.GET("/api/categories", getCategories)
-
-	// Get Render-assigned port (default to 8080)
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
+		log.Fatal("❌ Missing required database environment variables")
 	}
 
-	log.Println("🚀 Server is running on port", port)
+	// Correct MySQL DSN format
+	dsn := dbUser + ":" + dbPassword + "@tcp(" + dbHost + ":3306)/" + dbName + "?parseTime=true"
 
-	// Start the server
-	if err := r.Run(":" + port); err != nil {
-		log.Fatal("❌ Unable to start server: ", err)
+	db, err = sql.Open("mysql", dsn)
+	if err != nil {
+		log.Fatal("❌ Error opening database: ", err)
 	}
+
+	// Verify connection
+	if err := db.Ping(); err != nil {
+		log.Fatal("❌ Error pinging database: ", err)
+	}
+
+	log.Println("✅ Connected to MySQL database successfully")
 }
