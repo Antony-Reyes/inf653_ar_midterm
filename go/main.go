@@ -66,6 +66,23 @@ func initDB() {
 	log.Println("✅ Connected to MySQL database successfully")
 }
 
+// CORS middleware to allow frontend access
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Handle preflight requests
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	}
+}
+
 // GET /api/quotes/ - Fetch all quotes or filter by parameters
 func getQuotes(c *gin.Context) {
 	id := c.Query("id")
@@ -219,6 +236,9 @@ func main() {
 
 	// Set up Gin router
 	r := gin.Default()
+
+	// Apply CORS middleware
+	r.Use(corsMiddleware())
 
 	// Define API routes
 	r.GET("/api/quotes", getQuotes)

@@ -1,8 +1,8 @@
 <?php
 // Load environment variables
 $host = getenv("DB_HOST") ?: "44.226.145.213"; // Use Render DB_HOST or default to localhost
-$username = getenv("DB_USER") ?: ""; // Use Render DB_USER (ensure it's set!)
-$password = getenv("DB_PASSWORD") ?: ""; // Use Render DB_PASSWORD
+$username = getenv("DB_USER") ?: "your_database_username"; // Use Render DB_USER (ensure it's set!)
+$password = getenv("DB_PASSWORD") ?: "your_database_password"; // Use Render DB_PASSWORD
 $dbname = getenv("DB_NAME") ?: "DB_NAME"; // Use Render DB_NAME
 $port = getenv("DB_PORT") ?: "3306"; // Use Render DB_PORT (default 3306 for MySQL)
 
