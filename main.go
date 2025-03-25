@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +29,7 @@ func initDB() {
 	}
 
 	// MySQL connection string
-	dsn := dbUser + ":" + dbPassword + "@tcp(" + dbHost + ":3306)/" + dbName + "?parseTime=true"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName)
 
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
@@ -52,18 +53,28 @@ func getQuotes(c *gin.Context) {
 	query := "SELECT quotes.id, quotes.quote, authors.author, categories.category FROM quotes " +
 		"JOIN authors ON quotes.author_id = authors.id " +
 		"JOIN categories ON quotes.category_id = categories.id"
-
 	var args []interface{}
 
+	// Handle multiple filters
 	if id != "" {
 		query += " WHERE quotes.id = ?"
 		args = append(args, id)
-	} else if authorID != "" {
-		query += " WHERE quotes.author_id = ?"
-		args = append(args, authorID)
-	} else if categoryID != "" {
-		query += " WHERE quotes.category_id = ?"
-		args = append(args, categoryID)
+	} else {
+		conditions := []string{}
+		if authorID != "" {
+			conditions = append(conditions, "quotes.author_id = ?")
+			args = append(args, authorID)
+		}
+		if categoryID != "" {
+			conditions = append(conditions, "quotes.category_id = ?")
+			args = append(args, categoryID)
+		}
+		if len(conditions) > 0 {
+			query += " WHERE " + conditions[0]
+			for _, condition := range conditions[1:] {
+				query += " AND " + condition
+			}
+		}
 	}
 
 	rows, err := db.Query(query, args...)
@@ -179,30 +190,24 @@ func getCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
-func initDB() {
-	var err error
+func main() {
+	// Initialize database
+	initDB()
+	defer db.Close()
 
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
-	dbName := os.Getenv("DB_NAME")
+	// Set up Gin router
+	r := gin.Default()
 
-	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
-		log.Fatal("❌ Missing required database environment variables")
+	// Define API routes
+	r.GET("/api/quotes", getQuotes)
+	r.GET("/api/authors", getAuthors)
+	r.GET("/api/categories", getCategories)
+
+	// Start server
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default to port 8080 if not set
 	}
-
-	// Correct MySQL DSN format
-	dsn := dbUser + ":" + dbPassword + "@tcp(" + dbHost + ":3306)/" + dbName + "?parseTime=true"
-
-	db, err = sql.Open("mysql", dsn)
-	if err != nil {
-		log.Fatal("❌ Error opening database: ", err)
-	}
-
-	// Verify connection
-	if err := db.Ping(); err != nil {
-		log.Fatal("❌ Error pinging database: ", err)
-	}
-
-	log.Println("✅ Connected to MySQL database successfully")
+	log.Println("🚀 Server is running on port", port)
+	r.Run(":" + port)
 }
