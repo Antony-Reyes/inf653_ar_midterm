@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,22 +16,20 @@ var db *sql.DB
 func initDB() {
 	var err error
 
-	// Read database credentials from environment variables
+	// Load database credentials from environment variables (set in Render)
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST") // Use the correct Render database hostname
-	dbName := os.Getenv("INF653_AR_Midterm")
+	dbHost := os.Getenv("DB_HOST")
+	dbName := os.Getenv("DB_NAME")
 
-	// Ensure all required variables are set
+	// Ensure all necessary variables are set
 	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
 		log.Fatal("❌ Missing required database environment variables")
 	}
 
-	// Construct DSN (Data Source Name) - Render.com uses this format
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		dbUser, dbPassword, dbHost, dbName)
+	// Data Source Name (DSN) for MySQL connection
+	dsn := dbUser + ":" + dbPassword + "@tcp(" + dbHost + ":3306)/" + dbName + "?parseTime=true"
 
-	// Open database connection
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("❌ Error opening database: ", err)
@@ -40,15 +37,15 @@ func initDB() {
 
 	// Verify database connection
 	if err := db.Ping(); err != nil {
-		log.Fatal("❌ Error connecting to database: ", err)
+		log.Fatal("❌ Error pinging database: ", err)
 	}
 
-	log.Println("✅ Successfully connected to the database!")
+	log.Println("✅ Connected to MySQL database successfully")
 }
 
 // Route for fetching all authors
 func getAuthors(c *gin.Context) {
-	rows, err := db.Query("SELECT id, author FROM authors") // Assuming authors table has id and author
+	rows, err := db.Query("SELECT id, author FROM authors") // Updated column name
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -74,7 +71,7 @@ func getAuthors(c *gin.Context) {
 
 // Route for fetching all quotes
 func getQuotes(c *gin.Context) {
-	rows, err := db.Query("SELECT id, quote, author_id, category_id FROM quotes") // Assuming quotes table has these fields
+	rows, err := db.Query("SELECT id, quote, author_id, category_id FROM quotes")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -108,13 +105,20 @@ func main() {
 	// Set up Gin router
 	r := gin.Default()
 
-	// Define routes
+	// Define API routes
 	r.GET("/api/quotes", getQuotes)
 	r.GET("/api/authors", getAuthors)
 
-	// Start the server on port 8080
-	log.Println("🚀 Server is running on port 8080...")
-	if err := r.Run(":8080"); err != nil {
+	// Get Render-assigned port (fallback to 8080)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Println("🚀 Server is running on port", port)
+
+	// Start the server
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal("❌ Unable to start server: ", err)
 	}
 }
