@@ -34,9 +34,9 @@ func initDB() {
 		dbPort = "3306"
 	}
 
-	// Check for missing variables
-	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" || dbPort == "" {
-		log.Fatal("❌ Missing required database environment variables")
+	// Ensure all required environment variables are set
+	if dbUser == "" || dbPassword == "" || dbHost == "" || dbName == "" {
+		log.Fatal("❌ Missing required database environment variables. Check DB_HOST, DB_USER, DB_PASSWORD, and DB_NAME.")
 	}
 
 	// Log connection details (excluding password)
@@ -63,7 +63,6 @@ func initDB() {
 
 	// Assign connection to global db variable
 	db = dbConn
-
 	log.Println("✅ Connected to MySQL database successfully")
 }
 
@@ -229,7 +228,7 @@ func main() {
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // Default to port 8080 if not set
+		log.Fatal("❌ PORT environment variable not set. Ensure it's configured in Render.")
 	}
 	log.Println("🚀 Server is running on port", port)
 
