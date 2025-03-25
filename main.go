@@ -9,15 +9,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql" // MySQL driver
+	"github.com/joho/godotenv"
 )
 
-var db *sql.DB
+var db *sql.DB // Global database connection
 
 // Initialize the MySQL database connection
 func initDB() {
-	var err error
+	// Load environment variables from .env file (if exists)
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("⚠️ Warning: No .env file found, using system environment variables.")
+	}
 
-	// Load database credentials from Render's environment variables
+	// Get database credentials from environment variables
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbHost := os.Getenv("DB_HOST")
@@ -28,14 +33,17 @@ func initDB() {
 		log.Fatal("❌ Missing required database environment variables")
 	}
 
-	// Log connection details for debugging (excluding password)
+	// Log connection details (excluding password)
 	log.Println("🔹 DB_USER:", dbUser)
 	log.Println("🔹 DB_HOST:", dbHost)
 	log.Println("🔹 DB_NAME:", dbName)
 
 	// MySQL connection string
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", dbUser, dbPassword, dbHost, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true",
+		dbUser, dbPassword, dbHost, dbName,
+	)
 
+	// Open database connection
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("❌ Error opening database:", err)
