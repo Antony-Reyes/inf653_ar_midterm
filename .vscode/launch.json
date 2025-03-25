@@ -8,11 +8,11 @@
           "mode": "auto",
           "program": "${workspaceFolder}/main.go",
           "env": {
-              "DB_USER": "your_db_user",
-              "DB_PASSWORD": "your_db_password",
-              "DB_HOST": "your_db_host",
+              "DB_USER": "your_database_password",
+              "DB_PASSWORD": "your_database_password",
+              "DB_HOST": "your-database-host.render.com",
               "DB_NAME": "DB_NAME",
-              "PORT": "8080"
+              "PORT": "3306"
           },
           "args": []
       }
