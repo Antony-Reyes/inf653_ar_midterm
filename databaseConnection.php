@@ -18,7 +18,7 @@ class DatabaseConnection {
             $this->host = $config['db_host'] ?? getenv('HOST');
             $this->port = $config['db_port'] ?? getenv('PORT') ?? '5432';  // Default to 5432 if not set
         } else {
-            // Fall back to environment variables
+            // Fall back to environment variables if config.json does not exist
             $this->username = getenv('USERNAME');
             $this->password = getenv('PASSWORD');
             $this->dbname = getenv('DBNAME');
@@ -49,8 +49,6 @@ class DatabaseConnection {
 }
 
 // To use the connection, instantiate DatabaseConnection and call connect
-// This will allow you to use this object to connect to the database in other files (e.g., authors.php, categories.php)
-
 // Example usage:
 $dbConnection = new DatabaseConnection();
 $conn = $dbConnection->connect();
