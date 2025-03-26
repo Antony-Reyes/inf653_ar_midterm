@@ -1,8 +1,4 @@
 <?php
-
-include 'models/authors.php';
-include 'models/categories.php';
-include 'models/quotes.php';
 // index.php
 
 // Function to generate API documentation page
@@ -44,6 +40,9 @@ if ($_SERVER['REQUEST_URI'] == '/api/authors') {
     include 'categories.php';
 } elseif ($_SERVER['REQUEST_URI'] == '/api/quotes') {
     include 'quotes.php';
+} elseif ($_SERVER['REQUEST_URI'] == '/api') {
+    // Display the API documentation if the base /api endpoint is hit
+    displayApiDocumentation();
 } else {
     // Return an error message for invalid endpoints
     header("HTTP/1.1 404 Not Found");

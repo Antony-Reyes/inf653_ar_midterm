@@ -1,6 +1,6 @@
 <?php
 // Include the database connection
-include_once 'databaseConnection.php';  // Use the correct relative path to the databaseConnection.php file
+include_once '../databaseConnection.php'; // Use the correct relative path to the databaseConnection.php file
 
 // Create a DatabaseConnection instance and connect to the database
 $dbConnection = new DatabaseConnection();
