@@ -1,3 +1,10 @@
+# Ignore version control directories
+.git
+
+# Ignore environment variable files
 .env
 
+# Ignore node_modules (if applicable)
+node_modules/
 
+.htaccess
