@@ -12,6 +12,7 @@ class DatabaseConnection {
         $configPath = __DIR__ . '/config.json';
         if (file_exists($configPath)) {
             $config = json_decode(file_get_contents($configPath), true);
+            // Set values from config.json or fallback to environment variables
             $this->username = $config['db_user'] ?? getenv('USERNAME');
             $this->password = $config['db_password'] ?? getenv('PASSWORD');
             $this->dbname = $config['db_name'] ?? getenv('DBNAME');
@@ -25,19 +26,21 @@ class DatabaseConnection {
             $this->host = getenv('HOST');
             $this->port = getenv('PORT') ?? '5432';  // Default to 5432 if not set
         }
+
+        // Check if necessary values are set
+        if (!$this->username || !$this->password || !$this->dbname || !$this->host) {
+            error_log("Database configuration is incomplete. Check config.json or environment variables.");
+        }
     }
 
     // Establish connection to the database
     public function connect() {
         if ($this->conn === null) {
             $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}";
-
             try {
                 // Create a new PDO instance and set the error mode to exception
                 $this->conn = new PDO($dsn, $this->username, $this->password);
                 $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                // Uncomment below for debugging
-                // echo "Database connection successful!";
             } catch (PDOException $e) {
                 // Log the error message and return null on failure
                 error_log("Database connection failed: " . $e->getMessage());
