@@ -7,41 +7,45 @@ class DatabaseConnection {
     private $port;
     private $conn;
 
-    // Constructor to initialize class properties
     public function __construct() {
-        // Fetch environment variables for connection
-        $this->username = getenv('USERNAME');
-        $this->password = getenv('PASSWORD');
-        $this->dbname = getenv('DBNAME');
-        $this->host = getenv('HOST');
-        $this->port = getenv('PORT');
+        // Check if config.json exists and read from it
+        $configPath = __DIR__ . '/config.json';
+        if (file_exists($configPath)) {
+            $config = json_decode(file_get_contents($configPath), true);
+            $this->username = $config['db_user'] ?? getenv('USERNAME');
+            $this->password = $config['db_password'] ?? getenv('PASSWORD');
+            $this->dbname = $config['db_name'] ?? getenv('DBNAME');
+            $this->host = $config['db_host'] ?? getenv('HOST');
+            $this->port = $config['db_port'] ?? getenv('PORT');
+        } else {
+            // Fall back to environment variables
+            $this->username = getenv('USERNAME');
+            $this->password = getenv('PASSWORD');
+            $this->dbname = getenv('DBNAME');
+            $this->host = getenv('HOST');
+            $this->port = getenv('PORT');
+        }
     }
 
-    // Method to establish a connection to the database
     public function connect() {
         if ($this->conn === null) {
-            // Create a connection string for PostgreSQL
             $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}";
             
             try {
-                // Attempt to connect using PDO
                 $this->conn = new PDO($dsn, $this->username, $this->password);
                 $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                // Uncomment below for debugging to ensure successful connection
-                // echo "Connection successful!";
+                // Uncomment below for debugging
+                // echo "Database connection successful!";
             } catch (PDOException $e) {
-                // Handle connection errors and log them
-                error_log("Connection failed: " . $e->getMessage());
-                // Optionally, you can echo this error on the page for testing
-                // echo "Connection failed: " . $e->getMessage();
-                return null; // Return null on failure
+                error_log("Database connection failed: " . $e->getMessage());
+                return null; 
             }
         }
-        return $this->conn; // Return the existing connection if it exists
+        return $this->conn;
     }
 }
 
-// Usage example (optional, for testing purposes)
+// Testing connection (optional, for debugging)
 $dbConnection = new DatabaseConnection();
 $conn = $dbConnection->connect();
 if ($conn) {
