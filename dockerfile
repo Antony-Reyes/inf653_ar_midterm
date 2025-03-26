@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    zip unzip \
+    zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql mysqli \
     && rm -rf /var/lib/apt/lists/*
@@ -18,13 +18,13 @@ WORKDIR /var/www/html
 # Copy the application source code into the container
 COPY . /var/www/html
 
-# Copy custom Apache configuration
+# Copy custom Apache configuration (adjust path if necessary)
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
-# Enable necessary Apache modules
+# Enable necessary Apache modules (rewrite and headers)
 RUN a2enmod rewrite headers
 
-# Set proper file permissions (important for Laravel or similar frameworks)
+# Set proper file permissions (important for applications that require writing permissions like Laravel)
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
