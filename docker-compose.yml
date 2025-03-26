@@ -10,22 +10,26 @@ services:
     volumes:
       - .:/var/www/html
     environment:
-      HOST: db                # Points to the 'db' service in Docker, not localhost
-      DBNAME: ${DBNAME}         # Will be set by Render's environment variables
-      USERNAME: ${USERNAME}         # Will be set by Render's environment variables
-      PASSWORD: ${PASSWORD} # Will be set by Render's environment variables
+      HOST: dpg-cvhm5l1opnds73fl4170-a.oregon-postgres.render.com  # Matches Render.com
+      DBNAME: inf653_ar_midterm_7e6a  # Matches Render.com
+      USERNAME: inf653_ar_midterm_7e6a_user  # Matches Render.com
+      PASSWORD: 5zCP7GMDvHwtrpXF9D0hpgWFr6TGpQSu  # Matches Render.com
+      PORT: "5432"  # Matches Render.com
     depends_on:
       - db
 
   db:
-    image: mysql:5.7
+    image: postgres:16  # PostgreSQL 16 (latest stable version)
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}   # Set by Render environment variables
-      MYSQL_DATABASE: ${DBNAME}                    # Set by Render environment variables
-      MYSQL_USER: ${USERNAME}                        # Set by Render environment variables
-      MYSQL_PASSWORD: ${PASSWORD}                # Set by Render environment variables
+      POSTGRES_DB: inf653_ar_midterm_7e6a
+      POSTGRES_USER: inf653_ar_midterm_7e6a_user
+      POSTGRES_PASSWORD: 5zCP7GMDvHwtrpXF9D0hpgWFr6TGpQSu
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 volumes:
   db-data:
+
