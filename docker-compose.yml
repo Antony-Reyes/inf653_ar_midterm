@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   php-apache:
     build:
@@ -7,15 +9,21 @@ services:
       - "80:80"
     volumes:
       - .:/var/www/html
-    env_file:
-      - .env  # 👈 Add this line to load environment variables properly
+    environment:
+      DB_HOST: db                # Points to the 'db' service in Docker, not localhost
+      DB_NAME: ${DB_NAME}         # Will be set by Render's environment variables
+      DB_USER: ${DB_USER}         # Will be set by Render's environment variables
+      DB_PASSWORD: ${DB_PASSWORD} # Will be set by Render's environment variables
     depends_on:
       - db
 
   db:
     image: mysql:5.7
-    env_file:
-      - .env  # 👈 Add this to load DB credentials
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}   # Set by Render environment variables
+      MYSQL_DATABASE: ${DB_NAME}                    # Set by Render environment variables
+      MYSQL_USER: ${DB_USER}                        # Set by Render environment variables
+      MYSQL_PASSWORD: ${DB_PASSWORD}                # Set by Render environment variables
     volumes:
       - db-data:/var/lib/mysql
 
