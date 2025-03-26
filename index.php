@@ -35,11 +35,14 @@ function displayApiDocumentation() {
 
 // Set up routing (example)
 if ($_SERVER['REQUEST_URI'] == '/api/authors') {
-    include 'authors.php';
+    // Include the correct path to the authors.php file in the modules folder
+    include 'modules/authors.php';
 } elseif ($_SERVER['REQUEST_URI'] == '/api/categories') {
-    include 'categories.php';
+    // Include the correct path to the categories.php file in the modules folder
+    include 'modules/categories.php';
 } elseif ($_SERVER['REQUEST_URI'] == '/api/quotes') {
-    include 'quotes.php';
+    // Include the correct path to the quotes.php file in the modules folder
+    include 'modules/quotes.php';
 } elseif ($_SERVER['REQUEST_URI'] == '/api') {
     // Display the API documentation if the base /api endpoint is hit
     displayApiDocumentation();
