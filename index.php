@@ -1,11 +1,19 @@
 <?php
-// Display a simple welcome message
-echo "<h1>Welcome to INF653 AR Midterm API</h1>";
-echo "<p>This is the main index page for your API.</p>";
-echo "<p>Available Endpoints:</p>";
-echo "<ul>
-    <li><a href='authors.php'>Authors</a></li>
-    <li><a href='categories.php'>Categories</a></li>
-    <li><a href='quotes.php'>Quotes</a></li>
-</ul>";
+// index.php
+
+// Include the necessary files
+include 'authors.php';
+include 'categories.php';
+include 'quotes.php';
+
+// Set up routing (example)
+if ($_SERVER['REQUEST_URI'] == '/api/authors') {
+    include 'authors.php';
+} elseif ($_SERVER['REQUEST_URI'] == '/api/categories') {
+    include 'categories.php';
+} elseif ($_SERVER['REQUEST_URI'] == '/api/quotes') {
+    include 'quotes.php';
+} else {
+    echo "Invalid endpoint";
+}
 ?>
