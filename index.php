@@ -1,5 +1,5 @@
 <?php
-// index.php
+// index.php - API Documentation Page
 
 // Function to generate API documentation page
 function displayApiDocumentation() {
@@ -33,23 +33,6 @@ function displayApiDocumentation() {
     echo "</html>";
 }
 
-// Set up routing (example)
-if ($_SERVER['REQUEST_URI'] == '/api/authors') {
-    // Include the correct path to the authors.php file in the modules folder
-    include 'modules/authors.php';
-} elseif ($_SERVER['REQUEST_URI'] == '/api/categories') {
-    // Include the correct path to the categories.php file in the modules folder
-    include 'modules/categories.php';
-} elseif ($_SERVER['REQUEST_URI'] == '/api/quotes') {
-    // Include the correct path to the quotes.php file in the modules folder
-    include 'modules/quotes.php';
-} elseif ($_SERVER['REQUEST_URI'] == '/api') {
-    // Display the API documentation if the base /api endpoint is hit
-    displayApiDocumentation();
-} else {
-    // Return an error message for invalid endpoints
-    header("HTTP/1.1 404 Not Found");
-    echo "<h1>404 - Not Found</h1>";
-    echo "<p>The endpoint you are trying to access does not exist.</p>";
-}
+// Display API Documentation (No Routing)
+displayApiDocumentation();
 ?>
