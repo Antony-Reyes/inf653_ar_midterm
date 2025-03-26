@@ -7,51 +7,48 @@ class DatabaseConnection {
     private $port;
     private $conn;
 
-    // Constructor to initialize class properties from environment variables
+    // Constructor to initialize class properties
     public function __construct() {
-        // Fetch environment variables set by Render or other services
-        $this->username = getenv('USERNAME'); 
+        // Fetch environment variables for connection
+        $this->username = getenv('USERNAME');
         $this->password = getenv('PASSWORD');
         $this->dbname = getenv('DBNAME');
         $this->host = getenv('HOST');
         $this->port = getenv('PORT');
     }
 
-    // Method to establish a connection to the PostgreSQL database
+    // Method to establish a connection to the database
     public function connect() {
         if ($this->conn === null) {
             // Create a connection string for PostgreSQL
             $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}";
+            
             try {
-                // Establishing the PDO connection
+                // Attempt to connect using PDO
                 $this->conn = new PDO($dsn, $this->username, $this->password);
-                // Setting error mode to exceptions to handle errors effectively
                 $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                // Optionally log success for debugging purposes (consider removing this for production)
-                // echo "Connection successful!"; 
+                // Uncomment below for debugging to ensure successful connection
+                // echo "Connection successful!";
             } catch (PDOException $e) {
-                // Handle connection errors and log them for troubleshooting
-                error_log("Connection failed: " . $e->getMessage()); // Log the error to a file
-                // Display a generic message to the user (don't expose actual error in production)
-                echo "Database connection failed. Please try again later.";
+                // Handle connection errors and log them
+                error_log("Connection failed: " . $e->getMessage());
+                // Optionally, you can echo this error on the page for testing
+                // echo "Connection failed: " . $e->getMessage();
                 return null; // Return null on failure
             }
         }
-        return $this->conn; // Return the existing connection if it already exists
-    }
-
-    // Optional: Method to close the connection (good practice for resource management)
-    public function disconnect() {
-        $this->conn = null;
+        return $this->conn; // Return the existing connection if it exists
     }
 }
 
-// Usage example (can be placed in your app logic to use the connection)
+// Usage example (optional, for testing purposes)
 $dbConnection = new DatabaseConnection();
 $conn = $dbConnection->connect();
-
-// Perform your database operations here...
-
-// Don't forget to disconnect after operations are complete
-//$dbConnection->disconnect();
+if ($conn) {
+    // Uncomment below for debugging
+    // echo "Connected successfully!";
+} else {
+    // Uncomment below for debugging
+    // echo "Failed to connect to database!";
+}
 ?>
