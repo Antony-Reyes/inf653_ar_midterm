@@ -20,15 +20,22 @@ WORKDIR /var/www/html
 # Copy the application source code into the container
 COPY . /var/www/html
 
+# Ensure index.php is explicitly copied (prevents missing DirectoryIndex errors)
+COPY index.php /var/www/html/
+
 # Copy custom Apache configuration (adjust path if necessary)
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Enable necessary Apache modules (rewrite and headers)
 RUN a2enmod rewrite headers
 
-# Ensure proper file permissions
+# Set proper permissions for Apache to serve files correctly
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
+
+# Fix potential permission issues for logs and temp directories
+RUN mkdir -p /var/log/apache2 /var/www/html/tmp \
+    && chown -R www-data:www-data /var/log/apache2 /var/www/html/tmp
 
 # Install Composer for dependency management (if needed)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
