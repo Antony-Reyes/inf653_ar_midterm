@@ -8,8 +8,10 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     zip \
+    unzip \
+    curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql mysqli \
+    && docker-php-ext-install gd pdo pdo_pgsql pdo_mysql mysqli \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
@@ -24,9 +26,15 @@ COPY apache.conf /etc/apache2/sites-available/000-default.conf
 # Enable necessary Apache modules (rewrite and headers)
 RUN a2enmod rewrite headers
 
-# Set proper file permissions (important for applications that require writing permissions like Laravel)
+# Ensure proper file permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
+
+# Install Composer for dependency management (if needed)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install dependencies using Composer (uncomment if using PHP frameworks like Laravel)
+# RUN composer install --no-dev --optimize-autoloader
 
 # Expose port 80 for incoming HTTP connections
 EXPOSE 80
