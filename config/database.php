@@ -1,11 +1,11 @@
 <?php
 class Database {
-    private $conn;
-    private $host;
-    private $port;
-    private $dbname;
-    private $username;
-    private $password;
+    private $host = "dpg-cvhm5l1opnds73fl4170-a";  // Change to Render or Localhost
+    private $port = '5432';
+    private $db_name = "inf653_ar_midterm_7e6a";
+    private $username = "inf653_ar_midterm_7e6a_user";
+    private $password = "5zCP7GMDvHwtrpXF9D0hpgWFr6TGpQSu";
+    public $conn;
 }
 
 public function _construct() {
