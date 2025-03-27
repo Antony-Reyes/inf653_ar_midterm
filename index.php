@@ -1,19 +1,13 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Check if API endpoints are being accessed
-$request_uri = $_SERVER['REQUEST_URI'];
+$response = [
+    "message" => "Welcome to the Quotes API. Please use the /api/ endpoints."
+];
 
-if (strpos($request_uri, "/api/quotes/") !== false) {
-    include_once __DIR__ . "/api/quotes/index.php";
-} elseif (strpos($request_uri, "/api/authors/") !== false) {
-    include_once __DIR__ . "/api/authors/index.php";
-} elseif (strpos($request_uri, "/api/categories/") !== false) {
-    include_once __DIR__ . "/api/categories/index.php";
-} else {
-    // Default response
-    echo json_encode(["message" => "Welcome to the Quotes API"]);
-}
+echo json_encode($response);
 ?>
 
