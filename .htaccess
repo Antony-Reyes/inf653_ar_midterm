@@ -1,7 +1,7 @@
 # Enable Rewrite Engine
 RewriteEngine On
 
-# Allow direct access to existing API files
+# Ensure API requests go to the API directory
 RewriteCond %{REQUEST_URI} ^/api/ [NC]
 RewriteCond %{DOCUMENT_ROOT}/api/%{REQUEST_FILENAME} !-f
 RewriteCond %{DOCUMENT_ROOT}/api/%{REQUEST_FILENAME} !-d
@@ -15,12 +15,6 @@ RewriteRule ^ index.php [L]
 
 # Prevent directory listing
 Options -Indexes
-
-# Allow access to the API directory
-<Directory "/var/www/html/api">
-    AllowOverride All
-    Require all granted
-</Directory>
 
 # Allow CORS (for API requests)
 <IfModule mod_headers.c>
