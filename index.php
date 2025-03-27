@@ -1,6 +1,6 @@
 <?php
-// Define API base URL (Update if deployed)
-$api_url = "http://localhost/api/quotes/";
+// Define API base URL (Updated for deployed version)
+$api_url = "https://inf653-ar-midterm.onrender.com/api/quotes/";
 
 ?>
 
@@ -97,7 +97,7 @@ $(document).ready(function() {
 
     // Fetch Quotes
     function fetchQuotes() {
-        $.get("<?php echo $api_url; ?>read.php", function(data) {
+        $.get("<?php echo $api_url; ?>", function(data) {
             let quotes = data.data;
             let output = "";
             $.each(quotes, function(index, quote) {
@@ -127,7 +127,7 @@ $(document).ready(function() {
             category_id: $("#category_id").val()
         };
 
-        $.post("<?php echo $api_url; ?>create.php", JSON.stringify(newQuote), function(response) {
+        $.post("<?php echo $api_url; ?>", JSON.stringify(newQuote), function(response) {
             alert(response.message);
             fetchQuotes();
             $("#addQuoteForm")[0].reset();
@@ -158,7 +158,7 @@ $(document).ready(function() {
         };
 
         $.ajax({
-            url: "<?php echo $api_url; ?>update.php",
+            url: "<?php echo $api_url; ?>" + updatedQuote.id,
             type: "PUT",
             data: JSON.stringify(updatedQuote),
             contentType: "application/json",
@@ -175,7 +175,7 @@ $(document).ready(function() {
         let id = $(this).data("id");
         if (confirm("Are you sure you want to delete this quote?")) {
             $.ajax({
-                url: "<?php echo $api_url; ?>delete.php?id=" + id,
+                url: "<?php echo $api_url; ?>" + id,
                 type: "DELETE",
                 success: function(response) {
                     alert(response.message);
