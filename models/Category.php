@@ -1,41 +1,64 @@
 <?php
-// index.php - API Documentation Page
+class Category {
+    private $conn;
+    private $table = "categories";
 
-// Function to generate API documentation page
-function displayApiDocumentation() {
-    echo "<!DOCTYPE html>";
-    echo "<html lang='en'>";
-    echo "<head>";
-    echo "<meta charset='UTF-8'>";
-    echo "<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
-    echo "<title>INF653 AR Midterm API</title>";
-    echo "<style>";
-    echo "body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; text-align: center; }";
-    echo "h1 { color: #4CAF50; }";
-    echo "h2 { color: #333; }";
-    echo "p { max-width: 600px; margin: 0 auto 20px; }";
-    echo "ul { list-style-type: none; padding: 0; display: inline-block; text-align: left; }";
-    echo "li { margin: 10px 0; }";
-    echo "a { display: inline-block; background-color: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; }";
-    echo "a:hover { background-color: #45a049; }";
-    echo "</style>";
-    echo "</head>";
-    echo "<body>";
-    echo "<h1>Welcome to the INF653 AR Midterm API</h1>";
-    echo "<p>This API provides various endpoints to retrieve data. Click on any of the endpoints below to access the data.</p>";
-    
-    echo "<h2>Available Endpoints</h2>";
-    echo "<ul>";
-    echo "<li><a href='/api/authors' target='_blank'>View All Authors</a></li>";
-    echo "<li><a href='/api/categories' target='_blank'>View All Categories</a></li>";
-    echo "<li><a href='/api/quotes' target='_blank'>View All Quotes</a></li>";
-    echo "</ul>";
+    public $id;
+    public $name;
 
-    echo "<p><strong>Note:</strong> Ensure your database is properly connected before accessing these endpoints.</p>";
-    echo "</body>";
-    echo "</html>";
+    public function __construct($db) {
+        $this->conn = $db;
+    }
+
+    // Get all categories
+    public function read() {
+        $query = "SELECT * FROM " . $this->table . " ORDER BY id ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // Get single category
+    public function read_single() {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $this->name = $row['name'];
+        } else {
+            $this->name = null;
+        }
+    }
+
+    // Create a new category
+    public function create() {
+        $query = "INSERT INTO " . $this->table . " (name) VALUES (:name)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':name', $this->name);
+
+        return $stmt->execute();
+    }
+
+    // Update category
+    public function update() {
+        $query = "UPDATE " . $this->table . " SET name = :name WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':name', $this->name);
+        $stmt->bindParam(':id', $this->id);
+
+        return $stmt->execute();
+    }
+
+    // Delete category
+    public function delete() {
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+
+        return $stmt->execute();
+    }
 }
-
-// Display API Documentation (No Routing)
-displayApiDocumentation();
 ?>

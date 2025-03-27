@@ -1,23 +1,30 @@
 <?php
-header('Access-Control-Allow-Origin: *');
+// Headers to allow API access and set response type as JSON
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
+// Include database and quote model
 include_once '../../config/database.php';
 include_once '../../models/Quote.php';
 
-// Initialize DB connection
+// Instantiate Database
 $database = new Database();
 $db = $database->connect();
 
+// Instantiate Quote object
 $quote = new Quote($db);
-$result = $quote->read();
 
-if ($result->rowCount() > 0) {
-    $quotes_arr = array("data" => array());
+// Query to get quotes
+$result = $quote->read();
+$num = $result->rowCount();
+
+// Check if there are any quotes
+if ($num > 0) {
+    $quotes_arr = array();
 
     while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         extract($row);
-        $quotes_arr["data"][] = array(
+        $quotes_arr[] = array(
             "id" => $id,
             "quote" => $quote,
             "author" => $author_name,
@@ -25,8 +32,9 @@ if ($result->rowCount() > 0) {
         );
     }
 
-    echo json_encode($quotes_arr);
+    // Convert to JSON and output response
+    echo json_encode(["data" => $quotes_arr], JSON_PRETTY_PRINT);
 } else {
-    echo json_encode(array("message" => "No quotes found."));
+    echo json_encode(["message" => "No quotes found"]);
 }
 ?>
